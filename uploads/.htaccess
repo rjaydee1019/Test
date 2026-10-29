@@ -1,0 +1,5 @@
+Options -Indexes
+<FilesMatch "\.(php|php[0-9]?|phtml|phar|cgi|pl|py|sh)$">
+  Require all denied
+</FilesMatch>
+# Employee files are sensitive. For production, deny all direct access and use an authenticated download endpoint.
