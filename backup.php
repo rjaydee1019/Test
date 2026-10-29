@@ -21,7 +21,7 @@ if($action==='restore'){
   $db->query('SET FOREIGN_KEY_CHECKS=0');
   foreach(['audit_logs','employees','users'] as $t)$db->query('DELETE FROM `'.$t.'`');
   foreach($tables as $t){$cols=$columns[$t];$marks=implode(',',array_fill(0,count($cols),'?'));$names=implode(',',array_map(fn($c)=>'`'.$c.'`',$cols));$stmt=$db->prepare('INSERT INTO `'.$t.'` ('.$names.') VALUES ('.$marks.')');$types='';foreach($cols as $c)$types.=in_array($c,['id','is_active','created_by','user_id'],true)?'i':'s';
-   foreach($data['tables'][$t] as $row){$values=[];foreach($cols as $c){$v=$row[$c];if($v===null)$values[]=null;elseif(in_array($c,['id','is_active','created_by','user_id'],true))$values[]=(int)$v;else $values[]=(string)$v;}$stmt->bind_param($types,...$values);$stmt->execute();}
+   foreach($data['tables'][$t] as $row){$values=[];foreach($cols as $c){$v=$row[$c];if($v===null)$values[]=null;elseif(in_array($c,['id','is_active','created_by','user_id'],true))$values[]=(int)$v;else $values[]=(string)$v;}$refs=[];foreach($values as $k=>&$value)$refs[$k]=&$value;unset($value);$stmt->bind_param($types,...$refs);$stmt->execute();}
   }
   $db->query('SET FOREIGN_KEY_CHECKS=1');$db->commit();session_regenerate_id(true);$message='Restore completed. Sign out and sign in again using an account from the restored backup.';
  }catch(Throwable $e){try{$db->rollback();$db->query('SET FOREIGN_KEY_CHECKS=1');}catch(Throwable $ignored){}$error=$e instanceof RuntimeException?$e->getMessage():'Restore failed. No changes should have been committed; verify the backup and database schema.';}
