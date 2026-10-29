@@ -1,0 +1,6 @@
+/uploads/*
+!/uploads/.htaccess
+/config.local.php
+.env
+*.sql.bak
+.DS_Store
